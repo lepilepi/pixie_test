@@ -1,0 +1,118 @@
+<html>
+<head>
+    <title>pixi.js example 1</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+        }
+    </style>
+    <script src="pixi.js"></script>
+</head>
+<body>
+    <script>
+    FALL_SPEED = 7;
+
+    function choose(choices) {
+      index = Math.floor(Math.random() * choices.length);
+      return choices[index];
+    }
+    function remove(el, arr){
+        var index = arr.indexOf(el);
+        if (index > -1) {
+            arr.splice(index, 1);
+        }
+    }
+ 
+    // create an new instance of a pixi stage
+    var stage = new PIXI.Stage(0x66FF99);
+ 
+    // create a renderer instance.
+    var renderer = PIXI.autoDetectRenderer(800, 600);
+ 
+    // add the renderer view element to the DOM
+    document.body.appendChild(renderer.view);
+ 
+    requestAnimFrame( animate );
+
+
+    // create a texture from an image path
+    var texture = PIXI.Texture.fromImage("cat.png");
+    // create a new Sprite using the texture
+    var cat = new PIXI.Sprite(texture);
+ 
+
+    // center the sprites anchor point
+    cat.anchor.x = 0.5;
+    cat.anchor.y = 0.5;
+ 
+    // move the sprite t the center of the screen
+    cat.position.x = 400;
+    cat.position.y = 400;
+ 
+    stage.addChild(cat);    
+
+    var foods = new Array();
+    for (i=1; i<=9; i++){
+        var tex = PIXI.Texture.fromImage("/food/" + i + ".png");
+        var sprite = new PIXI.Sprite(tex);
+        sprite.anchor.x = 0.5;
+        sprite.anchor.y = 0.5;
+        sprite.position.x = 60;
+        sprite.position.y = -50;
+        foods.push(sprite);  
+    }
+
+    function drop_left(sprite){
+        sprite.position.x = 60;
+        sprite.position.y = -50;
+        stage.addChild(sprite)
+    }
+    
+    function drop_right(sprite){
+        sprite.position.x = 740;
+        sprite.position.y = -50;
+        stage.addChild(sprite)
+    }
+
+    var start = new Date().getTime();
+    var td = Math.floor((Math.random()*1000)+500);
+
+    function animate() {
+        var now = new Date().getTime();
+        if ((now-start) >= td){
+            if (Math.random()<.5){
+                var f = choose(foods);
+                drop_left(f);
+                remove(f, foods);
+            } else {
+                var f = choose(foods);
+                drop_right(f);
+                remove(f, foods);
+            }
+            start = now;
+            td = Math.floor((Math.random()*1000)+500);
+        }
+
+        requestAnimFrame( animate );
+
+        stage.children.forEach(function(sprite) {
+            if (sprite != cat){
+                sprite.rotation += 0.1;
+                sprite.position.y += FALL_SPEED;
+                if (sprite.position.y > 600+50){
+                    stage.removeChild(sprite);
+                    foods.push(sprite);
+                }
+            }
+        });
+
+        // render the stage   
+        renderer.render(stage);
+    }
+ 
+    </script>
+ 
+    </body>
+</html>
